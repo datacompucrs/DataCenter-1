@@ -1,0 +1,321 @@
+Vagrant.configure("2") do |config|
+
+  simid = 1557197687
+
+  config.vm.provider "virtualbox" do |v|
+
+    v.gui=false
+
+end
+
+
+
+##### DEFINE VM for leaf01 #####
+ config.vm.define "leaf01" do |device|
+
+   device.vm.hostname = "leaf01"
+  # config.vm.box = "hashicorp/precise64"
+   config.vm.box = "ubuntu/trusty64"
+   device.vm.provider "virtualbox" do |v|
+    # config.vm.box = "hashicorp/precise64"
+     v.name = "#{simid}_leaf01"
+     v.customize ["modifyvm", :id, '--audiocontroller', 'AC97', '--audio', 'Null']
+     v.memory = 768
+   end
+   #device.vm.synced_folder ".", "/vagrant", disabled: true
+
+
+   # NETWORK INTERFACES
+
+     # link for swp1 --> server01:eth1
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net2", auto_config: false , :mac => "443839000003"
+
+     # link for swp2 --> server02:eth1
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net12", auto_config: false , :mac => "443839000014"
+
+     # link for swp45 --> leaf01:swp46
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net18", auto_config: false , :mac => "44383900001d"
+
+     # link for swp46 --> leaf01:swp45
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net18", auto_config: false , :mac => "44383900001e"
+
+     # link for swp47 --> leaf01:swp48
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net41", auto_config: false , :mac => "443839000041"
+
+     # link for swp48 --> leaf01:swp47
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net41", auto_config: false , :mac => "443839000042"
+
+     # link for swp49 --> leaf02:swp49
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net10", auto_config: false , :mac => "443839000010"
+
+     # link for swp50 --> leaf02:swp50
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net1", auto_config: false , :mac => "443839000001"
+
+     device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-all', "--nictype3", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-all', "--nictype4", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-all', "--nictype5", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-all', "--nictype6", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-all', "--nictype7", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-all', "--nictype8", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-all', "--nictype9", "virtio"]
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-all', "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+    end
+
+    # Run the Config specified in the Node Attributes
+    device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
+    device.vm.provision :shell , path: "./config_switch.sh"
+
+
+    device.vm.provision :shell , :inline => <<-delete_udev_directory
+if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+fi
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+delete_udev_directory
+
+    device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:03 --> swp1"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:03", NAME="swp1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:14 --> swp2"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:14", NAME="swp2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:1d --> swp45"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:1d", NAME="swp45", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:1e --> swp46"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:1e", NAME="swp46", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:41 --> swp47"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:41", NAME="swp47", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:42 --> swp48"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:42", NAME="swp48", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:10 --> swp49"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:10", NAME="swp49", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:01 --> swp50"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:01", NAME="swp50", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+
+
+
+
+end
+
+##### DEFINE VM for leaf02 #####
+    config.vm.define "leaf02" do |device|
+
+      device.vm.hostname = "leaf02"
+      #config.vm.box = "hashicorp/precise64"
+      config.vm.box = "ubuntu/trusty64"
+      device.vm.provider "virtualbox" do |v|
+        #config.vm.box = "hashicorp/precise64"
+        v.name = "#{simid}_leaf02"
+        v.customize ["modifyvm", :id, '--audiocontroller', 'AC97', '--audio', 'Null']
+        v.memory = 768
+      end
+
+    #  device.vm.synced_folder ".", "/vagrant", disabled: true
+
+
+
+      # NETWORK INTERFACES
+
+        # link for swp1 --> server01:eth2
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net13", auto_config: false , :mac => "443839000015"
+
+        # link for swp2 --> server02:eth2
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net15", auto_config: false , :mac => "443839000018"
+
+        # link for swp45 --> leaf02:swp46
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net8", auto_config: false , :mac => "44383900000d"
+
+        # link for swp46 --> leaf02:swp45
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net8", auto_config: false , :mac => "44383900000e"
+
+        # link for swp47 --> leaf02:swp48
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net55", auto_config: false , :mac => "443839000058"
+
+        # link for swp48 --> leaf02:swp47
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net55", auto_config: false , :mac => "443839000059"
+
+        # link for swp49 --> leaf01:swp49
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net10", auto_config: false , :mac => "443839000011"
+
+        # link for swp50 --> leaf01:swp50
+        device.vm.network "private_network", virtualbox__intnet: "#{simid}_net1", auto_config: false , :mac => "443839000002"
+
+    device.vm.provider "virtualbox" do |vbox|
+     vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-all', "--nictype3", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-all', "--nictype4", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-all', "--nictype5", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-all', "--nictype6", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-all', "--nictype7", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-all', "--nictype8", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-all', "--nictype9", "virtio"]
+     vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-all', "--nictype10", "virtio"]
+     vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+end
+# Run the Config specified in the Node Attributes
+device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
+device.vm.provision :shell , path: "./config_switch.sh"
+
+
+
+device.vm.provision :shell , :inline => <<-delete_udev_directory
+if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+fi
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+delete_udev_directory
+
+    device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:15 --> swp1"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:15", NAME="swp1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:18 --> swp2"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:18", NAME="swp2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:0d --> swp45"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:0d", NAME="swp45", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:0e --> swp46"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:0e", NAME="swp46", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:58 --> swp47"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:58", NAME="swp47", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:59 --> swp48"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:59", NAME="swp48", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:11 --> swp49"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:11", NAME="swp49", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+     device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:02 --> swp50"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:02", NAME="swp50", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+
+
+end
+##### DEFINE VM for server01 #####
+ config.vm.define "server01" do |device|
+
+   device.vm.hostname = "server01"
+   #config.vm.box = "hashicorp/precise64"
+   config.vm.box = "ubuntu/trusty64"
+   device.vm.provider "virtualbox" do |v|
+     #config.vm.box = "hashicorp/precise64"
+     v.name = "#{simid}_server01"
+     v.customize ["modifyvm", :id, '--audiocontroller', 'AC97', '--audio', 'Null']
+     v.memory = 512
+   end
+
+   #device.vm.synced_folder ".", "/vagrant", disabled: true
+
+
+
+   # NETWORK INTERFACES
+
+     # link for eth1 --> leaf01:swp1
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net2", auto_config: false , :mac => "000300111101"
+
+     # link for eth2 --> leaf02:swp1
+     device.vm.network "private_network", virtualbox__intnet: "#{simid}_net13", auto_config: false , :mac => "000300111102"
+
+     device.vm.provider "virtualbox" do |vbox|
+
+  vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-all', "--nictype3", "virtio"]
+  vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-all', "--nictype4", "virtio"]
+  vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+end
+# Run the Config specified in the Node Attributes
+device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
+device.vm.provision :shell , path: "./config_server.sh"
+
+
+device.vm.provision :shell , :inline => <<-delete_udev_directory
+if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+fi
+rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+delete_udev_directory
+
+device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 00:03:00:11:11:01 --> eth1"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="00:03:00:11:11:01", NAME="eth1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+   device.vm.provision :shell , :inline => <<-udev_rule
+echo "  INFO: Adding UDEV Rule: 00:03:00:11:11:02 --> eth2"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="00:03:00:11:11:02", NAME="eth2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+udev_rule
+
+end
+
+
+##### DEFINE VM for server02 #####
+  config.vm.define "server02" do |device|
+
+    device.vm.hostname = "server02"
+  #  config.vm.box = "hashicorp/precise64"
+    config.vm.box = "ubuntu/trusty64"
+    device.vm.provider "virtualbox" do |v|
+      #config.vm.box = "hashicorp/precise64"
+      v.name = "#{simid}_server02"
+      v.customize ["modifyvm", :id, '--audiocontroller', 'AC97', '--audio', 'Null']
+      v.memory = 512
+    end
+
+    #device.vm.synced_folder ".", "/vagrant", disabled: true
+
+    # NETWORK INTERFACES
+
+      # link for eth1 --> leaf01:swp2
+      device.vm.network "private_network", virtualbox__intnet: "#{simid}_net12", auto_config: false , :mac => "000300222201"
+
+      # link for eth2 --> leaf02:swp2
+      device.vm.network "private_network", virtualbox__intnet: "#{simid}_net15", auto_config: false , :mac => "000300222202"
+
+      device.vm.provider "virtualbox" do |vbox|
+        vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-all', "--nictype3", "virtio"]
+        vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-all', "--nictype4", "virtio"]
+        vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      end
+      # Run the Config specified in the Node Attributes
+      device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
+      device.vm.provision :shell , path: "./config_server.sh"
+
+
+      device.vm.provision :shell , :inline => <<-delete_udev_directory
+  if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
+  rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+  fi
+  rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
+  delete_udev_directory
+      device.vm.provision :shell , :inline => <<-udev_rule
+    echo "  INFO: Adding UDEV Rule: 00:03:00:22:22:01 --> eth1"
+    echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="00:03:00:22:22:01", NAME="eth1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+    udev_rule
+         device.vm.provision :shell , :inline => <<-udev_rule
+    echo "  INFO: Adding UDEV Rule: 00:03:00:22:22:02 --> eth2"
+    echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="00:03:00:22:22:02", NAME="eth2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+    udev_rule
+    end
+end

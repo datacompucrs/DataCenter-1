@@ -1,0 +1,60 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+#Vagrant.configure(2) do |config|
+#  config.vm.box = "hashicorp/precise64"
+  #config.vm.box_version = "1.1.0"
+#  (1..3).each do |i|
+#  config.vm.define "node-#{i}" do |node|
+#    node.vm.provision "shell",
+      #inline: "sudo ./apache.sh",
+#      inline: "echo I'm in node-#{i}"
+#    end
+#  end
+  #config.vm.provision :shell, path: "apache.sh"
+  #config.vm.network :forwarded_port, guest: 80, host: 8080 #port Forward
+
+
+
+  #v.default_nic_type = "82543GC"
+  #Vagrant.require_version ">= 1.3.5"
+  #config.vm.provision "shell" do |s|
+  #  s.inline = "echo $1"
+  #  s.args   = "'hello, world!'"
+  #end
+VAGRANTFILE_API_VERSION = "2"
+
+cluster = {
+  "master" => { :ip => "192.168.33.10", :cpus => 1, :mem => 1024 },
+  "slave-1" => { :ip => "192.168.33.11", :cpus => 1, :mem => 512 }
+  #{}"slave-2" => { :ip => "192.168.33.12", :cpus => 1, :mem => 512 },
+  #{}"slave-3" => { :ip => "192.168.33.13", :cpus => 1, :mem => 512 }
+}
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  cluster.each_with_index do |(hostname, info), index|
+
+    config.vm.define hostname do |cfg|
+      cfg.vm.provider :virtualbox do |vb, override|
+        #config.vm.box = "ubuntu/trusty64"
+        config.vm.box = "hashicorp/precise64"
+        override.vm.network :private_network, ip: "#{info[:ip]}"
+        override.vm.hostname = hostname
+        vb.name = hostname
+        vb.customize ["modifyvm", :id, "--memory", info[:mem], "--cpus", info[:cpus], "--hwvirtex", "on"]
+      end # end provider
+    end # end config
+
+  end # end cluster
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.provision "shell", path: "apache.sh"
+  #config.vm.network :forwarded_port, guest: 80, host: 1234
+end
