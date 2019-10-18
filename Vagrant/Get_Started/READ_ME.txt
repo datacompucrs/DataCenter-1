@@ -7,7 +7,9 @@ cada um com dois servidores, foram alocados 700Mb por máquina.
 Para mudar a quantidade de memória, atualmente é necessário atualizar o script .sh
 
 o script converter.sh gera um arquivo topology.dot.
+Arquivos .dot podem ser abertos pelo programa Dot Viewer, o qual desenha em formato de grafo a topologia descrita.
 Este arquivo é lido pelo por topology_converter.py para a geração do Vagrantfile
+
 
 Para rodar o Vagrantfile é necessário estar na pasta e rodar o comando.
 Vagrant up
