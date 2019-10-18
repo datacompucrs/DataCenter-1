@@ -1,0 +1,27 @@
+to download
+git clone https://github.com/matferronato/DataCenter
+
+to add stuff
+git add <files>
+or
+git add *
+or
+Use atom text editor
+
+to create a new branch (sandbox directory to add your stuff)
+git checkout -b <NAME OF BRANCH>
+
+to return to master branch
+git checkout master
+
+to delete your branch
+git branch -d <NAME OF BRANCH>
+
+to upload stuff
+git push origin <NAME OF BRANCH>
+
+to update stuff
+git pull origin <NAME OF BRANCH>
+
+more stuff to read
+https://rogerdudler.github.io/git-guide/index.pt_BR.html

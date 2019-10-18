@@ -1,0 +1,16 @@
+baixar ultima versão do vagrant pelo site
+Debian 64b
+
+comando sudo dpkg -i vagrant_*.deb
+
+instalar bibliotecas
+sudo apt-get install libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev
+
+instlar libvirt
+vagrant plugin install vagrant-libvirt
+
+instalar mutate
+vagrant plugin install vagrant-mutate
+
+instalar virt-manager
+sudo apt-get install virt-manager
