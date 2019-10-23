@@ -14,3 +14,6 @@ vagrant plugin install vagrant-mutate
 
 instalar virt-manager
 sudo apt-get install virt-manager
+
+transformar box em libvirt
+vagrant mutate <box name> libvirt

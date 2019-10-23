@@ -1,0 +1,12 @@
+graph vx {
+"tor-A" [ os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+"server-A0" [ os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+
+"tor-B" [ os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+"server-B0" [ os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+
+"tor-A":"eth3" -- "tor-B":"eth3"
+
+"server-A0":"eth1" -- "tor-A":"eth2" [left_mac="00:01:00:11:11:01"][right_mac="00:08:00:11:11:01"]
+"server-B0":"eth1" -- "tor-B":"eth2" [left_mac="00:02:00:11:11:01"][right_mac="00:07:00:11:11:01"]
+}

@@ -1,4 +1,4 @@
-graph vx {
+vagraph vx {
 "tor-A" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_switch.sh" ]
 "server-A0" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
 "server-A1" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
