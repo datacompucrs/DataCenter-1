@@ -1,6 +1,6 @@
 para criação da topologia requisitada, necessário rodar o comando
 
-./converter.sh <Numero de TORs> <Numero de Servers>
+./converter.sh <Numero de TORs> <Numero de Servers> <memoria>
 
 Note que é importante conferir a quantidade de memória alocada para cada máquina. Para topologia com 2 tors,
 cada um com dois servidores, foram alocados 700Mb por máquina.
