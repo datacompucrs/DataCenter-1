@@ -57,7 +57,9 @@ echo "" >> topology.dot
 echo "}" >> topology.dot
 
 
-
-
 python ./topology_converter.py ./topology.dot -p libvirt
+
+eth_list=`cat topology.dot | grep -o "\w*eth\w*" | uniq`
+
+
 sed -i "/$hatedLine/d" ./Vagrantfile

@@ -55,4 +55,36 @@ echo "}" >> topology.dot
 
 
 python ./topology_converter.py ./topology.dot -p libvirt
+
+####CREATE IPS
+nServersNetworks=$(($allTors))
+standartIp="192.168.!0.@"
+for (( everyNetwork=0; everyNetwork < $nServersNetworks; everyNetwork++)); do
+  thisNetwork=`echo $standartIp | sed "s/!/$everyNetwork/g" | sed "s/@/0/g"`
+  echo ""
+  echo network $thisNetwork
+  for (( everyServer=0; everyServer < $allServers; everyServer++)); do
+    machineId=$(($everyServer+1))
+    machineNetwork=`echo $standartIp | sed "s/!/$everyNetwork/g" | sed "s/@/$machineId/g"`
+    echo machine $machineNetwork
+  done
+done
+    echo ""
+nTorNetworks=$((nServersNetworks-1))
+for (( everyTor=$everyNetwork; everyTor < $nTorNetworks+$everyNetwork; everyTor++)); do
+  thisNetwork=`echo $standartIp | sed "s/!/$everyTor/g" | sed "s/@/0/g"`
+  echo ""
+  echo network $thisNetwork
+  for (( everySwp=0; everySwp < 2; everySwp++)); do
+    swpId=$(($everySwp+1))
+    machineNetwork=`echo $standartIp | sed "s/!/$everyTor/g" | sed "s/@/$swpId/g"`
+    echo machine $machineNetwork
+  done
+done
+
+eth_list=`cat topology.dot | grep -o "\w*eth\w*" | sort | uniq`
+swp_list=`cat topology.dot | grep -o "\w*swp\w*" | sort | uniq`
+
+expectedText="sudo ipconfig $interface $ip up"
+
 sed -i "/$hatedLine/d" ./Vagrantfile
