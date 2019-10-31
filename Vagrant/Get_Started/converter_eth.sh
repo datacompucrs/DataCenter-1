@@ -9,19 +9,19 @@ allTors=$1
 allServers=$2
 allSwpConnections=$(($allTors -1))
 
-echo "graph vx {" > topology.dot
+echo "graph vx {" > viewer.dot
 
 ####DEFINE SERVERS AND TORS
 currentLetter=A
 for (( everyTor=0; everyTor < $allTors; everyTor++)); do
   thisTor=`echo $standartTor | sed "s/!/$currentLetter/g"`
-  echo $thisTor >> topology.dot
+  echo $thisTor >> viewer.dot
   for (( everyServer=0; everyServer < $allServers; everyServer++)); do
     thisServer=`echo $standartServer | sed "s/!/$currentLetter$everyServer/g"`
-    echo $thisServer >> topology.dot
+    echo $thisServer >> viewer.dot
   done
   currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
-  echo "" >> topology.dot;
+  echo "" >> viewer.dot;
 done
 
 
@@ -32,7 +32,7 @@ for (( everyTor=0; everyTor < $allTors; everyTor++)); do
   for (( everyServer=0; everyServer < $allServers; everyServer++)); do
     thisMacServer=$(($everyServer +1))
     thisConnection=`echo $standartServerConnection | sed "s/(/$currentLetter$everyServer/g" | sed "s/&/$thisMacServer/g" | sed "s/)/$currentLetter/g" | sed "s/!/$thisMacTor/g" | sed "s/@/$thisMacServer/g"`
-    echo $thisConnection >> topology.dot
+    echo $thisConnection >> viewer.dot
   done
   currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
 done
@@ -49,17 +49,9 @@ for (( everySwpConnection=0; everySwpConnection < $allSwpConnections; everySwpCo
   currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
   currentPort=$(($currentPort+1))
   nextPort=$(($nextPort+1))
-echo $thisSwpConnection >> topology.dot
+echo $thisSwpConnection >> viewer.dot
 done
 
-echo "" >> topology.dot
+echo "" >> viewer.dot
 
-echo "}" >> topology.dot
-
-
-python ./topology_converter.py ./topology.dot -p libvirt
-
-eth_list=`cat topology.dot | grep -o "\w*eth\w*" | uniq`
-
-
-sed -i "/$hatedLine/d" ./Vagrantfile
+echo "}" >> viewer.dot

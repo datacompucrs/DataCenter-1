@@ -1,6 +1,6 @@
 
-standartTor="\"tor-!\"   [function=\"leaf\" vagrant=\"eth1\" os=\"hashicorp/bionic64\" version=\"1.0.282\" memory=\"$3\" config=\"./helper_scripts/config_production_switch.sh\" ]"
-standartServer="\"server-!\" [function=\"host\" vagrant=\"eth3\" os=\"hashicorp/bionic64\" version=\"1.0.282\" memory=\"$3\" config=\"./helper_scripts/config_production_server.sh\" ] "
+standartTor="\"tor-!\"   [function=\"leaf\" vagrant=\"eth1\" os=\"$4\" version=\"$5\" memory=\"$3\" config=\"./helper_scripts/config_production_switch.sh\" ]"
+standartServer="\"server-!\" [function=\"host\" vagrant=\"eth3\" os=\"$4\" version=\"$5\" memory=\"$3\" config=\"./helper_scripts/config_production_server.sh\" ] "
 standartSwpConnection="\"tor-(\":\"swp&\" -- \"tor-)\":\"swp!\""
 standartServerConnection="\"server-(\":\"eth1\" -- \"tor-)\":\"swp&\" [left_mac=\"00:0!:00:@@:@@:0@\"]"
 hatedLine="Vagrant.require_version \">= 1.8.6\", \"< 2.0.0\""
@@ -55,36 +55,5 @@ echo "}" >> topology.dot
 
 
 python ./topology_converter.py ./topology.dot -p libvirt
-
-####CREATE IPS
-nServersNetworks=$(($allTors))
-standartIp="192.168.!0.@"
-for (( everyNetwork=0; everyNetwork < $nServersNetworks; everyNetwork++)); do
-  thisNetwork=`echo $standartIp | sed "s/!/$everyNetwork/g" | sed "s/@/0/g"`
-  echo ""
-  echo network $thisNetwork
-  for (( everyServer=0; everyServer < $allServers+$allServers; everyServer++)); do
-    machineId=$(($everyServer+1))
-    machineNetwork=`echo $standartIp | sed "s/!/$everyNetwork/g" | sed "s/@/$machineId/g"`
-    echo machine $machineNetwork
-  done
-done
-    echo ""
-nTorNetworks=$(($allTors-1))
-for (( everyTor=$everyNetwork; everyTor < $nTorNetworks+$everyNetwork; everyTor++)); do
-  thisNetwork=`echo $standartIp | sed "s/!/$everyTor/g" | sed "s/@/0/g"`
-  echo ""
-  echo network $thisNetwork
-  for (( everySwp=0; everySwp < 2; everySwp++)); do
-    swpId=$(($everySwp+1))
-    machineNetwork=`echo $standartIp | sed "s/!/$everyTor/g" | sed "s/@/$swpId/g"`
-    echo machine $machineNetwork
-  done
-done
-
-eth_list=`cat topology.dot | grep -o "\w*eth\w*" | sort | uniq`
-swp_list=`cat topology.dot | grep -o "\w*swp\w*" | sort | uniq`
-
-expectedText="sudo ipconfig $interface $ip up"
 
 sed -i "/$hatedLine/d" ./Vagrantfile

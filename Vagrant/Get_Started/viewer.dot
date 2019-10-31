@@ -1,0 +1,7 @@
+graph vx {
+"tor-A" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+"server-A0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="700" config="./helper_scripts/config_production_server.sh" ]
+
+"server-A0":"eth1" -- "tor-A":"eth1" [left_mac="00:01:00:11:11:01"][right_mac="00:10:00:11:11:01"]
+
+}
