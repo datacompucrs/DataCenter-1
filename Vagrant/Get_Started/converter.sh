@@ -63,7 +63,7 @@ fi
 ./converter_eth.sh $tor $server $memory $os $version
 ./converter_swp.sh $tor $server $memory $os $version
 
-#vagrant up
+vagrant up
 
 declare -a swpNames
 declare -a provisionText
@@ -77,18 +77,22 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
   if [[ $everyTor == 1 ]]; then
     currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
     intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
-    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp50 $intraTorIp up"
+    echo "provisioning machine tor-$currentLetter adding ip to swp50"
+    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp50 $intraTorIp up\"")
   elif [[ $everyTor == $tor ]]; then
     currentTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
     intraTorIp=`echo $currentTorIp | sed "s/@/49/g"`
-    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+    echo "provisioning machine tor-$currentLetter adding ip to swp50"
+    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp49 $intraTorIp up\"")
   else
     currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
     pastTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
     intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
-    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+    echo "provisioning machine tor-$currentLetter adding ip to swp50"
+    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp50 $intraTorIp up\"")
     intraTorIp=`echo $pastTorIp | sed "s/@/49/g"`
-    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+    echo "provisioning machine tor-$currentLetter adding ip to swp49"
+    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp49 $intraTorIp up\"")
   fi
 
 
@@ -104,7 +108,7 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
     provisionText+=" sudo ifconfig swp$everyServer ${swpArray[$everyServer]} up;"
   done
   provisionText+="\""
-  echo $provisionText
+  $(echo $provisionText)
 
 
   currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
