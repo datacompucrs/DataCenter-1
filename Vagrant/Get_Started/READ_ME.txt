@@ -19,3 +19,12 @@ e em seguida,
 Vagrant ssh <Nome da máquina>
 
 Vagrant destroy -f deleta a topologia criada
+
+Em caso de erro envolvendo nome de dominio é importante notar que existe a possibilidade do nome já ter sido usado
+por outro Vagrantfile, neste caso:
+
+Lista nomes
+virsh list --all
+
+deleta nomes
+virsh undefine <id> <name>

@@ -1,0 +1,1 @@
+2 1 500 hashicorp/bionic64 1.0.282 1 1 1

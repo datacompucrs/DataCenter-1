@@ -2,42 +2,76 @@ everyCommand=$*
 read -a commandArray <<< $everyCommand
 sizeArray=${#commandArray[@]}
 
+####define empty variables for comparision
 server=""
 tor=""
 memory=""
 os=""
 version=""
+destroy=""
+switchMode=""
+commandList=""
+standart=""
 
+####HELP TEXT
 if [[ $1 == --help ]]; then
-  echo -e "-s number of servers\n-t number of tors\n-m memory alocation\n-o operation system\n-v os version"
+  echo -e "-s server -- number of servers\n-t tor -- number of tors\n-m memory -- memory alocation\n-o os -- operation system\n-v version -- os version"
+  echo -e "-d destroy -- destroys topology after iteration\n-sw switch -- does not provide ip to swp\n-c commands -- uses a bash file to provide a list of commands"
+  echo "-st standart -- uses a txt file to have standart inputs"
   exit
 fi
 
-for (( everyCommand=0; everyCommand < $sizeArray; everyCommand=everyCommand+2)); do
+####CHECK EVERY ARGUMENT TO FILL SERVER, TOR, ETC, VARIABLES
+for (( everyCommand=0; everyCommand < $sizeArray; everyCommand=everyCommand+1)); do
   if [[ ${commandArray[$everyCommand]} == -s ]]; then
     server=${commandArray[$everyCommand+1]}
 
   fi
   if [[ ${commandArray[$everyCommand]} == -t ]]; then
     tor=${commandArray[$everyCommand+1]}
-
   fi
+
   if [[ ${commandArray[$everyCommand]} == -m ]]; then
     memory=${commandArray[$everyCommand+1]}
-
   fi
+
   if [[ ${commandArray[$everyCommand]} == -o ]]; then
     os=${commandArray[$everyCommand+1]}
-
   fi
+
   if [[ ${commandArray[$everyCommand]} == -v ]]; then
     version=${commandArray[$everyCommand+1]}
-
   fi
 
+  if [[ ${commandArray[$everyCommand]} == -d ]]; then
+    destroy=1
+  fi
 
+  if [[ ${commandArray[$everyCommand]} == -sw ]]; then
+    switchMode=1
+  fi
+  if [[ ${commandArray[$everyCommand]} == -c ]]; then
+    commandList=1
+  fi
+  if [[ ${commandArray[$everyCommand]} == -st ]]; then
+    standart=1
+  fi
 done
 
+if [[ $standart == 1 ]]; then
+  allArgs=`cat standartRules.txt`
+  read -a arrayArgs <<< $allArgs
+  tor=${arrayArgs[0]}
+  server=${arrayArgs[1]}
+  memory=${arrayArgs[2]}
+  os=${arrayArgs[3]}
+  version=${arrayArgs[4]}
+  destroy=${arrayArgs[5]}
+  switchMode=${arrayArgs[6]}
+  commandList=${arrayArgs[7]}
+fi
+
+####PROVIDES DEFAULT VALUE FOR EMPTY VARIABLES
 if [[ $server == "" ]]; then
   server=1
   echo no server definied, using server equal to 1
@@ -47,7 +81,7 @@ if [[ $tor == "" ]]; then
   echo no tor definied, using tor equal to 1
 fi
 if [[ $memory == "" ]]; then
- memory=700
+ memory=500
  echo no memory definied, using memory equal to 1
 fi
 if [[ $os == "" ]]; then
@@ -59,57 +93,87 @@ if [[ $version == "" ]]; then
  echo no version definied, using version equal to 1.0.282
 fi
 
+####CREATES A .DOT FILE IN ACORDANCE WITH DESIRED PROJECT VIEW
+./.converter_eth.sh $tor $server $memory $os $version
+####CREATES TOPOLOGY AND VAGRANTFILE
+./.converter_swp.sh $tor $server $memory $os $version
 
-./converter_eth.sh $tor $server $memory $os $version
-./converter_swp.sh $tor $server $memory $os $version
+####BOOT MACHINES
 
 vagrant up
+sleep 20
 
+echo "Vagrant already up, starting inline provisioning"
+####DEFINE IP ADDRESS FOR EACH INTERFACE
 declare -a swpNames
 declare -a provisionText
 currentLetter=A
 serverIp="10.32.!0.@"
 torIp="192.168.!0.@"
 for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
-
+  ####creates an ip address for each in between tor conection, if required
   currentName=tor-$currentLetter
   currentServerIp=`echo $serverIp | sed "s/!/$everyTor/g"`
-  if [[ $everyTor == 1 ]]; then
-    currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
-    intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
-    echo "provisioning machine tor-$currentLetter adding ip to swp50"
-    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp50 $intraTorIp up\"")
-  elif [[ $everyTor == $tor ]]; then
-    currentTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
-    intraTorIp=`echo $currentTorIp | sed "s/@/49/g"`
-    echo "provisioning machine tor-$currentLetter adding ip to swp50"
-    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp49 $intraTorIp up\"")
-  else
-    currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
-    pastTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
-    intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
-    echo "provisioning machine tor-$currentLetter adding ip to swp50"
-    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp50 $intraTorIp up\"")
-    intraTorIp=`echo $pastTorIp | sed "s/@/49/g"`
-    echo "provisioning machine tor-$currentLetter adding ip to swp49"
-    $(echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp49 $intraTorIp up\"")
+  if [[ $switchMode != 1 ]]; then
+    if [[ $tor != 1 ]]; then
+      if [[ $everyTor == 1 ]]; then
+        currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
+        intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
+        echo "provisioning machine tor-$currentLetter adding ip to swp50"
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp up" > /dev/null 2>&1
+      elif [[ $everyTor == $tor ]]; then
+        currentTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
+        intraTorIp=`echo $currentTorIp | sed "s/@/49/g"`
+        echo "provisioning machine tor-$currentLetter adding ip to swp50"
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp up" > /dev/null 2>&1
+      else
+        currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
+        pastTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
+        intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
+        echo "provisioning machine tor-$currentLetter adding ip to swp50"
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp up" > /dev/null 2>&1
+        intraTorIp=`echo $pastTorIp | sed "s/@/49/g"`
+        echo "provisioning machine tor-$currentLetter adding ip to swp49"
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp up" > /dev/null 2>&1
+      fi
+    fi
+
+    ####creates an ip address for each tor to server interface
+    unset swpNames
+    for (( everyServer=0; everyServer < $server+1; everyServer++)); do
+      oneServerIp=`echo $currentServerIp | sed "s/@/$((everyServer*2))/g"`
+      swpNames+="$oneServerIp "
+    done
+      read -a swpArray <<< $swpNames
+      provisionText="vagrant ssh tor-$currentLetter -c \""
+      for (( everyServer=1; everyServer < $server+1; everyServer++)); do
+        echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp$everyServer ${swpArray[$everyServer]} up\""
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp$everyServer ${swpArray[$everyServer]} up" > /dev/null 2>&1
+        echo "done"
+      done
   fi
-
-
+  ####creates an ip address for each server interface
   unset swpNames
   for (( everyServer=0; everyServer < $server+1; everyServer++)); do
-    oneServerIp=`echo $currentServerIp | sed "s/@/$((everyServer*2))/g"`
+    oneServerIp=`echo $currentServerIp | sed "s/@/$(((everyServer*2)+1))/g"`
     swpNames+="$oneServerIp "
   done
     read -a swpArray <<< $swpNames
     provisionText="vagrant ssh tor-$currentLetter -c \""
   for (( everyServer=1; everyServer < $server+1; everyServer++)); do
-
-    provisionText+=" sudo ifconfig swp$everyServer ${swpArray[$everyServer]} up;"
+    echo "vagrant ssh server-$currentLetter$((everyServer-1)) -c \"sudo ifconfig eth1 ${swpArray[$everyServer]} up\""
+    vagrant ssh server-$currentLetter$((everyServer-1)) -c "sudo ifconfig eth1 ${swpArray[$everyServer]} up" > /dev/null 2>&1
+    echo "done"
   done
-  provisionText+="\""
-  $(echo $provisionText)
-
 
   currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
 done
+
+if [[ $commandList == 1 ]]; then
+  ./instructions.sh
+fi
+
+
+if [[ $destroy == 1 ]]; then
+  vagrant destroy -f
+fi
