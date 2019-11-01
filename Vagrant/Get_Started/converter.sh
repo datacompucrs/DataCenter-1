@@ -64,3 +64,48 @@ fi
 ./converter_swp.sh $tor $server $memory $os $version
 
 #vagrant up
+
+declare -a swpNames
+declare -a provisionText
+currentLetter=A
+serverIp="10.32.!0.@"
+torIp="192.168.!0.@"
+for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
+
+  currentName=tor-$currentLetter
+  currentServerIp=`echo $serverIp | sed "s/!/$everyTor/g"`
+  if [[ $everyTor == 1 ]]; then
+    currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
+    intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
+    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp50 $intraTorIp up"
+  elif [[ $everyTor == $tor ]]; then
+    currentTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
+    intraTorIp=`echo $currentTorIp | sed "s/@/49/g"`
+    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+  else
+    currentTorIp=`echo $torIp | sed "s/!/$everyTor/g"`
+    pastTorIp=`echo $torIp | sed "s/!/$((everyTor-1))/g"`
+    intraTorIp=`echo $currentTorIp | sed "s/@/50/g"`
+    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+    intraTorIp=`echo $pastTorIp | sed "s/@/49/g"`
+    echo "vagrant ssh tor-$currentLetter sudo ifconfig swp49 $intraTorIp up"
+  fi
+
+
+  unset swpNames
+  for (( everyServer=0; everyServer < $server+1; everyServer++)); do
+    oneServerIp=`echo $currentServerIp | sed "s/@/$((everyServer*2))/g"`
+    swpNames+="$oneServerIp "
+  done
+    read -a swpArray <<< $swpNames
+    provisionText="vagrant ssh tor-$currentLetter -c \""
+  for (( everyServer=1; everyServer < $server+1; everyServer++)); do
+
+    provisionText+=" sudo ifconfig swp$everyServer ${swpArray[$everyServer]} up;"
+  done
+  provisionText+="\""
+  echo $provisionText
+
+
+  currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
+done
