@@ -63,7 +63,7 @@ if grep -q -i 'cumulus' /etc/lsb-release &> /dev/null; then
         echo "  INFO: Detected Cumulus Linux v$DISTRIB_RELEASE Release"
         if [[ $DISTRIB_RELEASE =~ ^3.[1-9].* ]]; then
             echo "### Fixing ONIE DHCP to avoid Vagrant Interface ###"
-            echo "     Note: Installing from ONIE will undo these changes." 
+            echo "     Note: Installing from ONIE will undo these changes."
             mkdir /tmp/foo
             mount LABEL=ONIE-BOOT /tmp/foo
             sed -i 's/eth0/eth1/g' /tmp/foo/grub/grub.cfg
@@ -131,7 +131,7 @@ Vagrant.configure("2") do |config|
 {% if device.memory is defined %}      v.memory = {{ device.memory }}{% endif %}
     end{% if synced_folder == False %}
     #   see note here: https://github.com/pradels/vagrant-libvirt#synced-folders
-    device.vm.synced_folder ".", "/vagrant", disabled: true{% endif %}
+    device.vm.synced_folder ".", "/vagrant", disabled: false{% endif %}
 
 {% if device.ssh_port is defined %}    # SSH Port
     device.vm.network :forwarded_port, guest: 22, host: {{ device.ssh_port }}, host_ip: "0.0.0.0", id: "ssh", auto_correct:true

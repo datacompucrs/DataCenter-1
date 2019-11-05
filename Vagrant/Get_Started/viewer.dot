@@ -2,11 +2,6 @@ graph vx {
 "tor-A" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
 "server-A0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
 
-"tor-B" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
-"server-B0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
-
 "server-A0":"eth1" -- "tor-A":"eth1" [left_mac="00:01:00:11:11:01"][right_mac="00:10:00:11:11:01"]
-"server-B0":"eth1" -- "tor-B":"eth1" [left_mac="00:02:00:11:11:01"][right_mac="00:20:00:11:11:01"]
-"tor-A":"eth2" -- "tor-B":"eth2" [left_mac="00:20:00:00:00:22"][right_mac="00:20:00:00:00:00"]
 
 }
