@@ -1,7 +1,29 @@
 graph vx {
-"tor-A" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
-"server-A0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
+"tor-A" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-A0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-A1" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-A2" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+
+"tor-B" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-B0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-B1" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-B2" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+
+"tor-C" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-C0" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-C1" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"server-C2" [function="host" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
 
 "server-A0":"eth1" -- "tor-A":"eth1" [left_mac="00:01:00:11:11:01"][right_mac="00:10:00:11:11:01"]
+"server-A1":"eth1" -- "tor-A":"eth2" [left_mac="00:01:00:22:22:02"][right_mac="00:10:00:22:22:02"]
+"server-A2":"eth1" -- "tor-A":"eth3" [left_mac="00:01:00:33:33:03"][right_mac="00:10:00:33:33:03"]
+"server-B0":"eth1" -- "tor-B":"eth1" [left_mac="00:02:00:11:11:01"][right_mac="00:20:00:11:11:01"]
+"server-B1":"eth1" -- "tor-B":"eth2" [left_mac="00:02:00:22:22:02"][right_mac="00:20:00:22:22:02"]
+"server-B2":"eth1" -- "tor-B":"eth3" [left_mac="00:02:00:33:33:03"][right_mac="00:20:00:33:33:03"]
+"server-C0":"eth1" -- "tor-C":"eth1" [left_mac="00:03:00:11:11:01"][right_mac="00:30:00:11:11:01"]
+"server-C1":"eth1" -- "tor-C":"eth2" [left_mac="00:03:00:22:22:02"][right_mac="00:30:00:22:22:02"]
+"server-C2":"eth1" -- "tor-C":"eth3" [left_mac="00:03:00:33:33:03"][right_mac="00:30:00:33:33:03"]
+"tor-A":"eth4" -- "tor-B":"eth4" [left_mac="00:40:00:00:00:44"][right_mac="00:40:00:00:00:00"]
+"tor-B":"eth5" -- "tor-C":"eth5" [left_mac="00:50:00:00:00:55"][right_mac="00:50:00:00:00:00"]
 
 }
