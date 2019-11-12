@@ -126,11 +126,8 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
           echo "provisioning machine tor-$currentLetter adding ip to swp50"
           vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp up" > /dev/null 2>&1
         else
-          inc=$((inc+1))
-          currentTorIp="192.168.10.@"
-          intraTorIp=`echo $currentTorIp | sed "s/@/$inc/g"`
-          echo "provisioning machine tor-$currentLetter ip $intraTorIp to swp50"
-          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp " > /dev/null 2>&1
+          echo "provisioning machine tor-$currentLetter ip 0 to swp50"
+          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 0 " > /dev/null 2>&1
           echo "provisioning machine tor-$currentLetter installing and adding bridge"
           vagrant ssh tor-$currentLetter -c "sudo apt-get install bridge-utils; sudo brctl addbr TOR; sudo brctl addif TOR swp50" > /dev/null 2>&1
         fi
@@ -142,10 +139,8 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
           echo "provisioning machine tor-$currentLetter adding ip $intraTorIp to swp49"
           vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp up" > /dev/null 2>&1
         else
-          inc=$((inc+1))
-          intraTorIp=`echo $currentTorIp | sed "s/@/$inc/g"`
-          echo "provisioning machine tor-$currentLetter adding ip $intraTorIp to swp49"
-          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp  " > /dev/null 2>&1
+          echo "provisioning machine tor-$currentLetter adding ip 0 to swp49"
+          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 0  " > /dev/null 2>&1
           echo "provisioning machine tor-$currentLetter installing and adding bridge"
           vagrant ssh tor-$currentLetter -c "sudo apt-get install bridge-utils; sudo brctl addbr TOR; sudo brctl addif TOR swp49" > /dev/null 2>&1
         fi
@@ -157,19 +152,13 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
           intraTorIp49=`echo $pastTorIp | sed "s/@/49/g"`
           echo "provisioning machine tor-$currentLetter adding ip $intraTorIp50 to swp50"
           vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp50 up" > /dev/null 2>&1
-
           echo "provisioning machine tor-$currentLetter adding ip to swp49"
           vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp49 up" > /dev/null 2>&1
         else
-          inc=$((inc+1))
-          intraTorIp=`echo $intraTorIp | sed "s/@/$inc/g"`
-          echo "provisioning machine tor-$currentLetter adding ip $intraTorIp to swp50"
-          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 $intraTorIp  " > /dev/null 2>&1
-
-          inc=$((inc+1))
-          intraTorIp=`echo $currentTorIp | sed "s/@/$inc/g"`
-          echo "provisioning machine tor-$intraTorIp adding ip $intraTorIp to swp49"
-          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 $intraTorIp  " > /dev/null 2>&1
+          echo "provisioning machine tor-$currentLetter adding ip 0 to swp50"
+          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp50 0  " > /dev/null 2>&1
+          echo "provisioning machine tor-$intraTorIp adding ip 0 to swp49"
+          vagrant ssh tor-$currentLetter -c "sudo ifconfig swp49 0  " > /dev/null 2>&1
           echo "provisioning machine tor-$currentLetter installing and adding bridge"
           vagrant ssh tor-$currentLetter -c "sudo apt-get install bridge-utils; sudo brctl addbr TOR; sudo brctl addif TOR swp49; sudo brctl addif TOR swp50;" > /dev/null 2>&1
         fi
@@ -195,20 +184,12 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
         echo "provisioning machine tor-$currentLetter installing and adding bridge"
         vagrant ssh tor-$currentLetter -c "sudo apt-get install bridge-utils; sudo brctl addbr TOR" > /dev/null 2>&1
       fi
-      unset swpNames
-      for (( everyServer=0; everyServer < $server+1; everyServer++)); do
-        inc=$((inc+1))
-        oneServerIp=`echo $currentTorIp | sed "s/@/$inc/g"`
-        swpNames+="$oneServerIp "
-      done
-      read -a swpArray <<< $swpNames
       provisionText="vagrant ssh tor-$currentLetter -c \""
       for (( everyServer=1; everyServer < $server+1; everyServer++)); do
-        echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp$everyServer ${swpArray[$everyServer]} \""
-        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp$everyServer ${swpArray[$everyServer]} ; sudo brctl addif TOR  swp$everyServer " > /dev/null 2>&1
+        echo "vagrant ssh tor-$currentLetter -c \"sudo ifconfig swp$everyServer 0 \""
+        vagrant ssh tor-$currentLetter -c "sudo ifconfig swp$everyServer 0 ; sudo brctl addif TOR swp$everyServer " > /dev/null 2>&1
         echo "done"
       done
-
       vagrant ssh tor-$currentLetter -c "sudo ifconfig TOR up;"
     fi
 
@@ -218,7 +199,7 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
   unset swpNames
   for (( everyServer=0; everyServer < $server+1; everyServer++)); do
     inc=$((inc+1))
-    oneServerIp=`echo $currentServerIp | sed "s/@/$(((everyServer+inc)+1))/g"`
+    oneServerIp=`echo $currentServerIp | sed "s/@/$inc/g"`
     swpNames+="$oneServerIp "
   done
     read -a swpArray <<< $swpNames
@@ -244,6 +225,7 @@ for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
   done;
 currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
 done;
+
 
 
 if [[ $commandList == 1 ]]; then
