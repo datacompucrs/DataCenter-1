@@ -115,8 +115,11 @@ inc="1"
 for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
   ####creates an ip address for each in between tor conection, if required
   currentName=tor-$currentLetter
-  #currentServerIp=`echo $serverIp | sed "s/!/$everyTor/g"`
-  currentServerIp="192.168.10.@"
+  if [[ $switchMode != 1 ]]; then
+    currentServerIp=`echo $serverIp | sed "s/!/$everyTor/g"`
+  else
+    currentServerIp="192.168.10.@"
+  fi
 
     if [[ $tor != 1 ]]; then
       if [[ $everyTor == 1 ]]; then

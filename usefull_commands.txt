@@ -1,0 +1,39 @@
+Linha=`cat Vagrantfile | grep -on "config.vm.define" | head -1 | cut -f1 -d ':'`
+Linha=$((Linha-2))
+myText="config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false, nfs_version: 4"
+sed "$Linha i $myText" Vagrantfile > Vagrantfile1
+rm Vagrantfile
+
+
+LOGAR EM OUTRA MAQUINA
+IP GAPHL16: 10.32.163.45
+ssh -X datacom@<IP> ou ssh -X datacom@<ID_DA_MAQUINA>
+Utilizar interface da outra maquina: nautilus &
+
+VLAN
+
+instalar o pacote VLAN
+sudo apt-get install vlan
+
+verificar o carregamento do modulo
+lsmod | grep 8021q
+
+carregar o modulo
+modprobe 8021q
+
+add IF a VLAN
+sudo vconfig add eth0 100
+
+subir o link da IF
+sudo ip link set up enp0s3.10
+
+route -n
+
+ip link add name br0 type bridge
+ip link set dev br0 up
+ip link set dev eth0 master br0
+ip link set dev eth1 master br0
+
+ip link set dev eth0 nomaster
+
+ip link del br0
