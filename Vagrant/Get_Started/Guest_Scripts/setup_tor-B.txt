@@ -1,0 +1,3 @@
+tor-B swp49 0
+tor-B swp1 0
+tor-B swp2 0

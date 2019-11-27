@@ -54,6 +54,6 @@ done
 echo "}" >> topology.dot
 
 
-python ./topology_converter.py ./topology.dot -p libvirt
+python ./topology_converter.py ./topology.dot -p libvirt  &> /dev/null
 
 sed -i "/$hatedLine/d" ./Vagrantfile
