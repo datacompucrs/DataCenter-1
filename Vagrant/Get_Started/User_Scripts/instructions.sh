@@ -1,1 +1,2 @@
-vagrant ssh tor-A -c  "name="LALALA"; sudo brctl show > /vagrant/$name.txt"  
+vagrant ssh tor-A -c  " /vagrant/User_Script/standartRules.txt"
+vagrant ssh tor-B -c  " /vagrant/User_Script/standartRules.txt"

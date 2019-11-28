@@ -68,7 +68,8 @@ echo -e ${YELLOW}"creating IPs for all machines"${NC}
 ./Host_Scripts/create_IPs.sh $server $tor $ip
 echo -e ${YELLOW}"creating IP files for each machine"${NC}
 ./Host_Scripts/break_IPs.sh $server $tor
-
+echo -e ${YELLOW}"creating script to set comunication"${NC}
+./Host_Scripts/create_interfaceFiles.sh $server $tor $op
 ####BOOT MACHINES
 
 vagrant up
@@ -81,7 +82,7 @@ echo -e ${YELLOW}"setting topology segmentation"${NC}
 
 
 if [[ $commandList == 1 ]]; then
-  ./User_Script/User_Script/instructions.sh
+  ./User_Script/instructions.sh
 fi
 
 

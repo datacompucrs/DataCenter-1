@@ -8,25 +8,21 @@ BLUE='\033[0;34m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-alltTors=`ls ./Guest_Scripts/ | grep setup_tor`
+alltTors=`ls ./Guest_Scripts/ | grep interface_commands_`
 
 if    [[ $op == "1" ]]; then #Bridge Only
-  for eachTor in $alltTors; do
-    read -a infoArray <<< $(cat ./Guest_Scripts/$eachTor)
-    echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for ${infoArray[0]} machine"${NC}
-    vagrant ssh ${infoArray[0]} -c "
-    sudo apt-get install bridge-utils;
-    thisText=\`cat /vagrant/Guest_Scripts/${eachTor} |  cut -d\" \" -f2- | sed 's/ /\n/g' | awk '{a=\$0;printf \"%s \",a,\$0}'\`;
-    read -a swpArray <<< \$thisText;
-    sizeArray=\${#swpArray[@]};
-    sudo brctl addbr br0
-    sudo ip link set br0 up;
-    for (( everyItem=0; everyItem < \$sizeArray /2; everyItem=everyItem+1));
-      do echo \${swpArray[(2*\$everyItem)]}
-      sudo brctl addif br0 \${swpArray[(2*\$everyItem)]}
-    done;"
-  done
+for eachTor in $alltTors; do
+  thisMachine=${eachTor:19:-3}
+  echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for $thisMachine machine"${NC}
+  vagrant ssh $thisMachine -c " /vagrant/Guest_Scripts/$eachTor"
+done
 elif    [[ $op == "2" ]]; then #Vlan
+for eachTor in $alltTors; do
+  thisMachine=${eachTor:19:-3}
+  echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for $thisMachine machine"${NC}
+  vagrant ssh $thisMachine -c " /vagrant/Guest_Scripts/$eachTor"
+done
+elif    [[ $op == "3" ]]; then #Vlan
   for eachTor in $alltTors; do
     read -a infoArray <<< $(cat ./Guest_Scripts/$eachTor)
     echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} and ${GREEN}vlan${BLUE} for ${infoArray[0]} machine"${NC}
