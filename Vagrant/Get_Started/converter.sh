@@ -32,6 +32,7 @@ for (( everyCommand=0; everyCommand < $sizeArray; everyCommand=everyCommand+1));
   if [[ ${commandArray[$everyCommand]} == -c ]];         then commandList=1;                            fi
   if [[ ${commandArray[$everyCommand]} == --bridge ]];   then op=1;                                     fi
   if [[ ${commandArray[$everyCommand]} == --vlan ]];     then op=2;                                     fi
+  if [[ ${commandArray[$everyCommand]} == --spine ]];    then op=3;                                     fi
 done
 
 if [[ $standart == 1 ]]; then
@@ -57,17 +58,25 @@ if [[ $os == "" ]];        then os=hashicorp/bionic64; echo no os definied, usin
 if [[ $version == "" ]];   then version=1.0.282;       echo no version definied, using version equal to 1.0.282;  fi
 
 ####CREATES A .DOT FILE IN ACORDANCE WITH DESIRED PROJECT VIEW
-./.converter_eth.sh $tor $server $memory $os $version
+./.converter_eth.sh $tor $server $memory $os $version $op
 ####CREATES TOPOLOGY AND VAGRANTFILE
-./.converter_swp.sh $tor $server $memory $os $version
+./.converter_swp.sh $tor $server $memory $os $version $op
 
 rm -rf ./Guest_Scripts/*
 
 ####CREATE IPS
 echo -e ${YELLOW}"creating IPs for all machines"${NC}
-./Host_Scripts/create_IPs.sh $server $tor $ip
+if [[ $op == 3 ]]; then
+  ./Host_Scripts/create_IPs_spine.sh $server $tor $ip
+else
+  ./Host_Scripts/create_IPs.sh $server $tor $ip
+fi
 echo -e ${YELLOW}"creating IP files for each machine"${NC}
-./Host_Scripts/break_IPs.sh $server $tor
+if [[ $op == 3 ]]; then
+  ./Host_Scripts/break_IPs_spine.sh $server $tor
+else
+  ./Host_Scripts/break_IPs.sh $server $tor
+fi
 echo -e ${YELLOW}"creating script to set comunication"${NC}
 ./Host_Scripts/create_interfaceFiles.sh $server $tor $op
 ####BOOT MACHINES

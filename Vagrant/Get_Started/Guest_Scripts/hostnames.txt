@@ -1,5 +1,11 @@
 
-1.1.10.1 server-A0
-1.1.10.2 server-A1
-1.1.10.3 server-B0
-1.1.10.4 server-B1
+1.1.10.4 server-A0
+1.1.10.5 server-A1
+1.1.10.9 server-B0
+1.1.10.10 server-B1
+1.1.10.1 tor-A0
+1.1.10.2 tor-A1
+1.1.10.3 tor-A2
+1.1.10.6 tor-B0
+1.1.10.7 tor-B1
+1.1.10.8 tor-B2

@@ -24,3 +24,11 @@ for everyServer in $AllServers; do
   read -a arrayIp <<< $(cat $everyServer)
   echo ${arrayIp[2]} ${arrayIp[0]} >> hostnames.txt
 done
+AllTors=`ls | grep tor`
+for everyTor in $AllTors; do
+  torSwpNumber=`cat $everyTor | wc | awk '{print $1}'`
+  for (( eachLine=0; eachLine < $torSwpNumber; eachLine++)); do
+    read -a arrayIp <<< $(cat $everyTor | head -n $((eachLine+1)) | tail -n 1)
+    echo ${arrayIp[2]} ${arrayIp[0]}$eachLine >> hostnames.txt
+  done
+done
