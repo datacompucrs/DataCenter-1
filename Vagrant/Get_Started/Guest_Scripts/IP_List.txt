@@ -1,4 +1,8 @@
-tor-A swp1 0
-tor-A swp2 0
-server-A0 eth1 2.2.10.1
-server-A1 eth1 2.2.10.2
+spine swp1 1.1.10.1
+tor-LA swp50 0
+tor-LA swp1 0
+server-LA0 eth1 1.1.10.2
+spine swp2 1.1.20.1
+tor-RA swp50 0
+tor-RA swp1 0
+server-RA0 eth1 1.1.20.2

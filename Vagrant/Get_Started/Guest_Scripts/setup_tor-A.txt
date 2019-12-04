@@ -1,2 +1,0 @@
-tor-A swp1 0
-tor-A swp2 0

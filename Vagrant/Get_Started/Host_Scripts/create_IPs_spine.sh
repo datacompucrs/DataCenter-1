@@ -28,6 +28,11 @@ if    [[ $networkConfig == "1" ]]; then #No Ip
     for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
       currentName=tor-$direction$currentLetter
       currentServerIp="0"
+      if [[ $everySpine == 0 ]]; then
+        echo "spine swp$everyTor $constantZero" >> IP_List.txt
+      else
+        echo "spine swp$((tor+everyTor)) $constantZero" >> IP_List.txt
+      fi
         echo "$currentName swp50 $constantZero" >> IP_List.txt
       for (( everyServer=1; everyServer < $server+1; everyServer++)); do
         echo "$currentName swp$everyServer $constantZero" >> IP_List.txt
@@ -54,7 +59,7 @@ elif  [[ $networkConfig == "2" ]]; then #Servers with IP, Tor without, except sp
       if [[ $everySpine == 0 ]]; then
         echo "spine swp$everyTor $thisServerIP" >> IP_List.txt
       else
-        echo "spine swp$((everyTor+2)) $thisServerIP" >> IP_List.txt
+        echo "spine swp$((tor+everyTor)) $thisServerIP" >> IP_List.txt
       fi
       currentName=tor-$direction$currentLetter
       echo "$currentName swp50 $constantZero" >> IP_List.txt
@@ -88,7 +93,7 @@ elif  [[ $networkConfig == "3" ]]; then #Servers with IP, Tor with Ip, spine wit
       if [[ $everySpine == 0 ]]; then
         echo "spine swp$everyTor $thisServerIP" >> IP_List.txt
       else
-        echo "spine swp$((everyTor+2)) $thisServerIP" >> IP_List.txt
+        echo "spine swp$((tor+ everyTor)) $thisServerIP" >> IP_List.txt
       fi
       thisServerIP=`echo $currentServerIp | sed "s/@/$((inc))/g"`
       echo "$currentName swp50 $thisServerIP" >> IP_List.txt
@@ -96,12 +101,12 @@ elif  [[ $networkConfig == "3" ]]; then #Servers with IP, Tor with Ip, spine wit
 
       for (( everyServer=1; everyServer < $server+1; everyServer++)); do
         thisServerIP=`echo $currentServerIp | sed "s/@/$((inc))/g"`
-        echo "tor-$currentLetter swp$everyServer $thisServerIP" >> IP_List.txt
+        echo "$currentName swp$everyServer $thisServerIP" >> IP_List.txt
         inc=$((inc+1))
       done
       for (( everyServer=1; everyServer < $server+1; everyServer++)); do
         thisServerIP=`echo $currentServerIp | sed "s/@/$((inc))/g"`
-        echo "server-$currentLetter$((everyServer-1)) eth1 $thisServerIP" >> IP_List.txt
+        echo "server-$direction$currentLetter$((everyServer-1)) eth1 $thisServerIP" >> IP_List.txt
         inc=$((inc+1))
       done
       currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
@@ -158,6 +163,8 @@ for (( everySpine=0; everySpine < 2; everySpine++)); do
       currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
     done
   done
+###################################################################################################################
+
 elif [[ $networkConfig == "5" ]]; then         #New IP only for servers
   spineport=1
   for (( everySpine=0; everySpine < 2; everySpine++)); do
@@ -207,6 +214,8 @@ elif [[ $networkConfig == "5" ]]; then         #New IP only for servers
         currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
       done
     done
+###################################################################################################################
+
 else  #Servers with IP, Tor without, except spine conection, each half of spine have different ip
   incNetwork=1
   for (( everySpine=0; everySpine < 2; everySpine++)); do
@@ -225,7 +234,7 @@ else  #Servers with IP, Tor without, except spine conection, each half of spine 
       if [[ $everySpine == 0 ]]; then
         echo "spine swp$everyTor $thisServerIP" >> IP_List.txt
       else
-        echo "spine swp$((everyTor+2)) $thisServerIP" >> IP_List.txt
+        echo "spine swp$((tor+everyTor)) $thisServerIP" >> IP_List.txt
       fi
       echo "$currentName swp50 $constantZero" >> IP_List.txt
       inc=$((inc+1))

@@ -1,5 +1,9 @@
 
-2.2.10.1 server-A0
-2.2.10.2 server-A1
-0 tor-A0
-0 tor-A1
+1.1.10.2 server-LA0
+1.1.20.2 server-RA0
+0 tor-LA0
+0 tor-LA1
+0 tor-RA0
+0 tor-RA1
+1.1.10.1 spine0
+1.1.20.1 spine1

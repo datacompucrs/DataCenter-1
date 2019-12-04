@@ -83,13 +83,14 @@ vagrant up
 sleep 20
 
 echo -e ${YELLOW}"adding IP for each interface and adding hostname information"${NC}
-./Host_Scripts/set_interfaces.sh $server $tor
+./Host_Scripts/set_interfaces.sh $server $tor $op
 echo -e ${YELLOW}"setting topology segmentation"${NC}
 ./Host_Scripts/set_segmentation.sh $server $tor $op
 
 
 if [[ $commandList == 1 ]]; then
-  ./User_Script/instructions.sh
+  echo -e ${YELLOW}"running user scripts"${NC}
+  ./User_Scripts/instructions.sh
 fi
 
 

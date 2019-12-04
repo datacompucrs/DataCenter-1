@@ -39,6 +39,7 @@ done
 AllServers=`ls | grep server`
 for everyServer in $AllServers; do
   read -a arrayIp <<< $(cat $everyServer)
+  echo $everyServer ${arrayIp[0]}
   echo ${arrayIp[2]} ${arrayIp[0]} >> hostnames.txt
 done
 AllTors=`ls | grep tor`

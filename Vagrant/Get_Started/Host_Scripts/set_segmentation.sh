@@ -13,13 +13,13 @@ alltTors=`ls ./Guest_Scripts/ | grep interface_commands_`
 if    [[ $op == "1" ]]; then #Bridge Only
 for eachTor in $alltTors; do
   thisMachine=${eachTor:19:-3}
-  echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for $thisMachine machine"${NC}
+  echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for ${GREEN}$thisMachine${BLUE} machine"${NC}
   vagrant ssh $thisMachine -c " /vagrant/Guest_Scripts/$eachTor"
 done
 elif    [[ $op == "2" ]]; then #Vlan
 for eachTor in $alltTors; do
   thisMachine=${eachTor:19:-3}
-  echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} for $thisMachine machine"${NC}
+  echo -e ${BLUE}"creating ${GREEN}vlan${BLUE} for ${GREEN}$thisMachine${BLUE} machine"${NC}
   vagrant ssh $thisMachine -c " /vagrant/Guest_Scripts/$eachTor"
 done
 elif    [[ $op == "3" ]]; then #Vlan

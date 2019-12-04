@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 if [[ $op == "1" ]]; then #bridge
   for eachTor in $alltTors; do
     read -a infoArray <<< $(cat ./Guest_Scripts/$eachTor)
-    echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} file for ${infoArray[0]} machine"${NC}
+    echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} file for ${GREEN}${infoArray[0]}${BLUE} machine"${NC}
     echo "sudo ip link add name br0 type bridge" >>   ./Guest_Scripts/interface_commands_${infoArray[0]}.sh
     echo "sudo ip link set dev br0 up" >> ./Guest_Scripts/interface_commands_${infoArray[0]}.sh
     echo "thisText=\`cat /vagrant/Guest_Scripts/${eachTor} |  cut -d\" \" -f2- | sed 's/ /\n/g' | awk '{a=\$0;printf \"%s \",a,\$0}'\`;" >> ./Guest_Scripts/interface_commands_${infoArray[0]}.sh
@@ -28,7 +28,7 @@ if [[ $op == "1" ]]; then #bridge
 elif    [[ $op == "2" ]]; then #Vlan
   for eachTor in $alltTors; do
     read -a infoArray <<< $(cat ./Guest_Scripts/$eachTor)
-    echo -e ${BLUE}"creating ${GREEN}bridge${BLUE} file for ${infoArray[0]} machine"${NC}
+    echo -e ${BLUE}"creating ${GREEN}vlan${BLUE} file for ${GREEN}${infoArray[0]}${BLUE} machine"${NC}
     echo "sudo ip link add name br0 type bridge" >>   ./Guest_Scripts/interface_commands_${infoArray[0]}.sh
     echo "sudo ip link add name br1 type bridge" >>   ./Guest_Scripts/interface_commands_${infoArray[0]}.sh
     echo "sudo ip link set dev br0 up" >> ./Guest_Scripts/interface_commands_${infoArray[0]}.sh

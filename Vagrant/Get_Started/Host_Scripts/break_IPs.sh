@@ -8,7 +8,6 @@ currentLetter=A
 for (( everyTor=1; everyTor < $tor+1; everyTor++)); do
   for (( everyServer=0; everyServer < $server; everyServer++)); do
     cat IP_List.txt | grep server-$currentLetter$everyServer > ./setup_server-$currentLetter$everyServer.txt
-
   done;
 currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
 done;
