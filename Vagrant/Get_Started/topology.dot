@@ -3,14 +3,7 @@ graph vx {
 "server-A0" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
 "server-A1" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
 
-"tor-B" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ]
-"server-B0" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
-"server-B1" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_server.sh" ]
-
-"tor-A":"swp50" -- "tor-B":"swp49"
 
 "server-A0":"eth1" -- "tor-A":"swp1"
 "server-A1":"eth1" -- "tor-A":"swp2"
-"server-B0":"eth1" -- "tor-B":"swp1"
-"server-B1":"eth1" -- "tor-B":"swp2"
 }

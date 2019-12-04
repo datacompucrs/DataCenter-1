@@ -1,0 +1,52 @@
+Topology creator is an abstraction level of cummulus network topology_converter
+This is a series of bash scripts that wraps cummulus python file so it can provide
+a topology for datacenters.
+
+-o Operation system:
+  This option provides a way to select which vagrant box you would like to use in your topology
+  Default value is hashicorp/bionic64
+
+-v Version
+  This option provides a way to select which OS version vagrant box you would like to use in your topology
+  Default value is 1.0.282 for hashicorp/bionic64
+
+-t Tor number:
+  This option provides a way to select the number of tor machines (leaf machines) that will be created
+  Each tor is a TOP OF RACK linux machine that can be abstract as an switch hardware
+  Each tor will have a number of servers wired to it via its swp ports
+  If --spines is added to the list of arguments, port swp50 will be linked to a router machines named spine
+  in other case, port swp50 will be linked to swp49 of the neighbor tor
+  Default value is 1
+
+-s Server number:
+  This option provides a way to select the number of server machines that will be created
+  Each server is a linux machine
+  Each server will have only one tor wired to it via its eth0
+  Default value is 1
+
+-m Memory
+  Ram allocated to each machine
+  Default value is 500mb
+
+-d Delete
+  Delete topology after creation
+  This option was created to run debug tests
+
+-st Standart
+  When -st is passed as an argument, converter.sh will read a .txt file at
+  ./User_Script/standartRules.txt and parse its value
+  Each column will be the value of an argument of converter.sh
+  This option exist so the user does not need to run converter.sh with arguments every single time
+
+-c Command
+  This option provides a way to pass a number of commands to each machine after initialization
+  After vagrant create every machine in the topology, converter.sh will run the bash script at
+  ./User_Script/instructions.sh
+
+--brige
+
+--vlan
+
+--spine
+
+--ip

@@ -111,12 +111,12 @@ Vagrant.configure("2") do |config|
     # NETWORK INTERFACES
       # link for eth0 --> NOTHING:NOTHING
       device.vm.network "private_network",
-            :mac => "44:38:39:00:00:0b",
+            :mac => "44:38:39:00:00:05",
             :libvirt__tunnel_type => 'udp',
             :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '8007',
+            :libvirt__tunnel_local_port => '8004',
             :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '9007',
+            :libvirt__tunnel_port => '9004',
             :libvirt__iface_name => 'eth0',
             auto_config: false
       # link for swp1 --> server-A0:eth1
@@ -131,128 +131,13 @@ Vagrant.configure("2") do |config|
             auto_config: false
       # link for swp2 --> server-A1:eth1
       device.vm.network "private_network",
-            :mac => "44:38:39:00:00:06",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '9003',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '8003',
-            :libvirt__iface_name => 'swp2',
-            auto_config: false
-      # link for swp50 --> tor-B:swp49
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:07",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '8004',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '9004',
-            :libvirt__iface_name => 'swp50',
-            auto_config: false
-
-
-
-    # Fixes "stdin: is not a tty" and "mesg: ttyname failed : Inappropriate ioctl for device"  messages --> https://github.com/mitchellh/vagrant/issues/1673
-    device.vm.provision :shell , inline: "(sudo grep -q 'mesg n' /root/.profile 2>/dev/null && sudo sed -i '/mesg n/d' /root/.profile  2>/dev/null) || true;", privileged: false
-
-    
-    # Run the Config specified in the Node Attributes
-    device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
-    device.vm.provision :shell , path: "./helper_scripts/config_production_switch.sh"
-
-
-    # Install Rules for the interface re-map
-    device.vm.provision :shell , :inline => <<-delete_udev_directory
-if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
-    rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-fi
-rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-delete_udev_directory
-
-device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:0b --> eth0"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:0b", NAME="eth0", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:02 --> swp1"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:02", NAME="swp1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:06 --> swp2"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:06", NAME="swp2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:07 --> swp50"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:07", NAME="swp50", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     
-      device.vm.provision :shell , :inline => <<-vagrant_interface_rule
-echo "  INFO: Adding UDEV Rule: Vagrant interface = eth1"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{ifindex}=="2", NAME="eth1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-echo "#### UDEV Rules (/etc/udev/rules.d/70-persistent-net.rules) ####"
-cat /etc/udev/rules.d/70-persistent-net.rules
-vagrant_interface_rule
-
-# Run Any Platform Specific Code and Apply the interface Re-map
-    #   (may or may not perform a reboot depending on platform)
-    device.vm.provision :shell , :inline => $script
-
-end
-
-  ##### DEFINE VM for tor-B #####
-  config.vm.define "tor-B" do |device|
-    device.vm.hostname = "tor-B" 
-    device.vm.box = "hashicorp/bionic64"
-    device.vm.box_version = "1.0.282"
-
-    device.vm.provider :libvirt do |v|
-      v.memory = 500
-    end
-    #   see note here: https://github.com/pradels/vagrant-libvirt#synced-folders
-    device.vm.synced_folder ".", "/vagrant", disabled: false
-
-
-
-    # NETWORK INTERFACES
-      # link for eth0 --> NOTHING:NOTHING
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:0c",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '8008',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '9008',
-            :libvirt__iface_name => 'eth0',
-            auto_config: false
-      # link for swp1 --> server-B0:eth1
-      device.vm.network "private_network",
             :mac => "44:38:39:00:00:04",
             :libvirt__tunnel_type => 'udp',
             :libvirt__tunnel_local_ip => '127.0.0.1',
             :libvirt__tunnel_local_port => '9002',
             :libvirt__tunnel_ip => '127.0.0.1',
             :libvirt__tunnel_port => '8002',
-            :libvirt__iface_name => 'swp1',
-            auto_config: false
-      # link for swp2 --> server-B1:eth1
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:0a",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '9005',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '8005',
             :libvirt__iface_name => 'swp2',
-            auto_config: false
-      # link for swp49 --> tor-A:swp50
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:08",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '9004',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '8004',
-            :libvirt__iface_name => 'swp49',
             auto_config: false
 
 
@@ -275,20 +160,16 @@ rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
 delete_udev_directory
 
 device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:0c --> eth0"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:0c", NAME="eth0", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:05 --> eth0"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:05", NAME="eth0", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
 udev_rule
      device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:04 --> swp1"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:04", NAME="swp1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:02 --> swp1"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:02", NAME="swp1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
 udev_rule
      device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:0a --> swp2"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:0a", NAME="swp2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:08 --> swp49"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:08", NAME="swp49", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
+echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:04 --> swp2"
+echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:04", NAME="swp2", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
 udev_rule
      
       device.vm.provision :shell , :inline => <<-vagrant_interface_rule
@@ -385,134 +266,6 @@ end
 
     # NETWORK INTERFACES
       # link for eth1 --> tor-A:swp2
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:05",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '8003',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '9003',
-            :libvirt__iface_name => 'eth1',
-            auto_config: false
-
-
-
-    # Fixes "stdin: is not a tty" and "mesg: ttyname failed : Inappropriate ioctl for device"  messages --> https://github.com/mitchellh/vagrant/issues/1673
-    device.vm.provision :shell , inline: "(sudo grep -q 'mesg n' /root/.profile 2>/dev/null && sudo sed -i '/mesg n/d' /root/.profile  2>/dev/null) || true;", privileged: false
-
-    
-    # Run the Config specified in the Node Attributes
-    device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
-    device.vm.provision :shell , path: "./helper_scripts/config_production_server.sh"
-
-
-    # Install Rules for the interface re-map
-    device.vm.provision :shell , :inline => <<-delete_udev_directory
-if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
-    rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-fi
-rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-delete_udev_directory
-
-device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:05 --> eth1"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:05", NAME="eth1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     
-      device.vm.provision :shell , :inline => <<-vagrant_interface_rule
-echo "  INFO: Adding UDEV Rule: Vagrant interface = eth3"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{ifindex}=="2", NAME="eth3", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-echo "#### UDEV Rules (/etc/udev/rules.d/70-persistent-net.rules) ####"
-cat /etc/udev/rules.d/70-persistent-net.rules
-vagrant_interface_rule
-
-# Run Any Platform Specific Code and Apply the interface Re-map
-    #   (may or may not perform a reboot depending on platform)
-    device.vm.provision :shell , :inline => $script
-
-end
-
-  ##### DEFINE VM for server-B1 #####
-  config.vm.define "server-B1" do |device|
-    device.vm.hostname = "server-B1" 
-    device.vm.box = "hashicorp/bionic64"
-    device.vm.box_version = "1.0.282"
-
-    device.vm.provider :libvirt do |v|
-      v.nic_model_type = 'e1000' 
-      v.memory = 500
-    end
-    #   see note here: https://github.com/pradels/vagrant-libvirt#synced-folders
-    device.vm.synced_folder ".", "/vagrant", disabled: false
-
-
-
-    # NETWORK INTERFACES
-      # link for eth1 --> tor-B:swp2
-      device.vm.network "private_network",
-            :mac => "44:38:39:00:00:09",
-            :libvirt__tunnel_type => 'udp',
-            :libvirt__tunnel_local_ip => '127.0.0.1',
-            :libvirt__tunnel_local_port => '8005',
-            :libvirt__tunnel_ip => '127.0.0.1',
-            :libvirt__tunnel_port => '9005',
-            :libvirt__iface_name => 'eth1',
-            auto_config: false
-
-
-
-    # Fixes "stdin: is not a tty" and "mesg: ttyname failed : Inappropriate ioctl for device"  messages --> https://github.com/mitchellh/vagrant/issues/1673
-    device.vm.provision :shell , inline: "(sudo grep -q 'mesg n' /root/.profile 2>/dev/null && sudo sed -i '/mesg n/d' /root/.profile  2>/dev/null) || true;", privileged: false
-
-    
-    # Run the Config specified in the Node Attributes
-    device.vm.provision :shell , privileged: false, :inline => 'echo "$(whoami)" > /tmp/normal_user'
-    device.vm.provision :shell , path: "./helper_scripts/config_production_server.sh"
-
-
-    # Install Rules for the interface re-map
-    device.vm.provision :shell , :inline => <<-delete_udev_directory
-if [ -d "/etc/udev/rules.d/70-persistent-net.rules" ]; then
-    rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-fi
-rm -rfv /etc/udev/rules.d/70-persistent-net.rules &> /dev/null
-delete_udev_directory
-
-device.vm.provision :shell , :inline => <<-udev_rule
-echo "  INFO: Adding UDEV Rule: 44:38:39:00:00:09 --> eth1"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="44:38:39:00:00:09", NAME="eth1", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-udev_rule
-     
-      device.vm.provision :shell , :inline => <<-vagrant_interface_rule
-echo "  INFO: Adding UDEV Rule: Vagrant interface = eth3"
-echo 'ACTION=="add", SUBSYSTEM=="net", ATTR{ifindex}=="2", NAME="eth3", SUBSYSTEMS=="pci"' >> /etc/udev/rules.d/70-persistent-net.rules
-echo "#### UDEV Rules (/etc/udev/rules.d/70-persistent-net.rules) ####"
-cat /etc/udev/rules.d/70-persistent-net.rules
-vagrant_interface_rule
-
-# Run Any Platform Specific Code and Apply the interface Re-map
-    #   (may or may not perform a reboot depending on platform)
-    device.vm.provision :shell , :inline => $script
-
-end
-
-  ##### DEFINE VM for server-B0 #####
-  config.vm.define "server-B0" do |device|
-    device.vm.hostname = "server-B0" 
-    device.vm.box = "hashicorp/bionic64"
-    device.vm.box_version = "1.0.282"
-
-    device.vm.provider :libvirt do |v|
-      v.nic_model_type = 'e1000' 
-      v.memory = 500
-    end
-    #   see note here: https://github.com/pradels/vagrant-libvirt#synced-folders
-    device.vm.synced_folder ".", "/vagrant", disabled: false
-
-
-
-    # NETWORK INTERFACES
-      # link for eth1 --> tor-B:swp1
       device.vm.network "private_network",
             :mac => "44:38:39:00:00:03",
             :libvirt__tunnel_type => 'udp',

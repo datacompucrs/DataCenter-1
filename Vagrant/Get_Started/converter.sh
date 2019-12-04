@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 ####define empty variables for comparision
-server="";tor="";memory="";os="";version="";destroy="";switchMode="";commandList="";standart="";ip="";op=0;
+server="";tor="";memory="";os="";version="";destroy="";commandList="";standart="";ip="";op=0;
 
 ####HELP TEXT
 if [[ $1 == --help ]]; then
@@ -28,7 +28,6 @@ for (( everyCommand=0; everyCommand < $sizeArray; everyCommand=everyCommand+1));
   if [[ ${commandArray[$everyCommand]} == -v ]];         then version=${commandArray[$everyCommand+1]}; fi
   if [[ ${commandArray[$everyCommand]} == -d ]];         then destroy=1;                                fi
   if [[ ${commandArray[$everyCommand]} == -st ]];        then standart=1;                               fi
-  if [[ ${commandArray[$everyCommand]} == -sw ]];        then switchMode=1;                             fi
   if [[ ${commandArray[$everyCommand]} == -c ]];         then commandList=1;                            fi
   if [[ ${commandArray[$everyCommand]} == --bridge ]];   then op=1;                                     fi
   if [[ ${commandArray[$everyCommand]} == --vlan ]];     then op=2;                                     fi
@@ -44,7 +43,6 @@ if [[ $standart == 1 ]]; then
   os=${arrayArgs[3]}
   version=${arrayArgs[4]}
   destroy=${arrayArgs[5]}
-  switchMode=${arrayArgs[6]}
   commandList=${arrayArgs[7]}
   up=${arrayArgs[8]}
 fi
