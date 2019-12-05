@@ -1,1 +1,0 @@
-server-LA0 eth1 1.1.10.2

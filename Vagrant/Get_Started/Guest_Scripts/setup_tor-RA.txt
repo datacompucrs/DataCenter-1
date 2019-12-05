@@ -1,2 +1,0 @@
-tor-RA swp50 0
-tor-RA swp1 0

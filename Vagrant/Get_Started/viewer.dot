@@ -1,13 +1,8 @@
 graph vx {
-"tor-LA" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_switch.sh" ]
-"server-LA0" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
+"tor-A":"eth50" -- "tor-B":"eth49"
 
-"tor-RA" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_switch.sh" ]
-"server-RA0" [function="host" vagrant="eth3" os="hashicorp/bionic64" version="1.0.282" memory="600" config="./helper_scripts/config_production_server.sh" ]
-
-"tor-LA":"eth50" -- "spine":"eth1"
-"tor-RA":"eth50" -- "spine":"eth2"
-
-"server-LA0":"eth1" -- "tor-LA":"eth1" [left_mac="00:01:00:11:11:01"]
-"server-RA0":"eth1" -- "tor-RA":"eth1" [left_mac="00:01:00:11:11:01"]
+"server-A0":"eth1" -- "tor-A":"eth1" [left_mac="00:01:00:11:11:01"]
+"server-A1":"eth1" -- "tor-A":"eth2" [left_mac="00:01:00:22:22:02"]
+"server-B0":"eth1" -- "tor-B":"eth1" [left_mac="00:02:00:11:11:01"]
+"server-B1":"eth1" -- "tor-B":"eth2" [left_mac="00:02:00:22:22:02"]
 }

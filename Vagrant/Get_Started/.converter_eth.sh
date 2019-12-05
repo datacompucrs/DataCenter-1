@@ -19,41 +19,6 @@ echo "graph vx {" > viewer.dot
 ####DEFINE SERVERS AND TORS
 currentLetter=A
 
-if [[ $spineOn =  "3" ]]; then ## SPINE TOPOLOGY
-  echo $standartSpine >> topology.dot
-  for (( everySpine=0; everySpine < 2; everySpine++)); do
-    if [[ $everySpine == 0 ]]; then
-      newTor=`echo $standartTor | sed "s/!/L!/g"`
-      newServer=`echo $standartServer | sed "s/!/L!/g"`
-    else
-      newTor=`echo $standartTor | sed "s/!/R!/g"`
-      newServer=`echo $standartServer | sed "s/!/R!/g"`
-    fi
-    for (( everyTor=0; everyTor < $allTors; everyTor++)); do
-      thisTor=`echo $newTor | sed "s/!/$currentLetter/g"`
-      echo $thisTor >> viewer.dot
-      for (( everyServer=0; everyServer < $allServers; everyServer++)); do
-        thisServer=`echo $newServer | sed "s/!/$currentLetter$everyServer/g"`
-        echo $thisServer >> viewer.dot
-      done
-      currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
-      echo "" >> viewer.dot
-    done
-    currentLetter=A
-  done
-else    ## TOPOLOGY WITHOUT SPINE
-  for (( everyTor=0; everyTor < $allTors; everyTor++)); do
-    thisTor=`echo $standartTor | sed "s/!/$currentLetter/g"`
-    echo $thisTor >> viewer.dot
-    for (( everyServer=0; everyServer < $allServers; everyServer++)); do
-      thisServer=`echo $standartServer | sed "s/!/$currentLetter$everyServer/g"`
-      echo $thisServer >> viewer.dot
-    done
-    currentLetter=$(echo "$currentLetter" | tr "0-9A-Z" "1-9A-Z_")
-    echo "" >> viewer.dot
-  done
-fi
-
 ####CREATE SWITCH PORT CONNECTIONS
 if [[ $spineOn =  "3" ]]; then ## SPINE TOPOLOGY
   leafPort=50

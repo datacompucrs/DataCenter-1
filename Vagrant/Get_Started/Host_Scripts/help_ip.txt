@@ -1,0 +1,156 @@
+--ip
+  This option provides an array of ips to each machine, these might vary according to the argument given as input and
+  its type of operation. When it is running normally(every time excepts when --spine is passed as argument)
+
+    1: Provides no IP
+    e.g:
+        tor-A     swp50 0
+        tor-A     swp1  0
+        server-A0 eth1  0
+        tor-B     swp49 0
+        tor-B     swp1  0
+        server-B0 eth1  0
+
+    2: Provides no IP only for servers eth1
+    e.g:
+        tor-A     swp50 0
+        tor-A     swp1  0
+        server-A0 eth1  1.1.10.1
+        tor-B     swp49 0
+        tor-B     swp1  0
+        server-B0 eth1  1.1.10.2
+
+    3: Provides the same network IP for every port
+    e.g:
+        tor-A     swp50 1.1.10.1
+        tor-A     swp1  1.1.10.2
+        server-A0 eth1  1.1.10.3
+        tor-B     swp49 1.1.10.4
+        tor-B     swp1  1.1.10.5
+        server-B0 eth1  1.1.10.6
+
+    4: Provides the a new network IP for each logical enlace
+    e.g:
+        server-A0 eth1  2.2.10.3
+        tor-A     swp1  2.2.10.2
+        server-B0 eth1  2.2.20.3
+        tor-B     swp1  2.2.20.2
+        tor-B     swp49 3.3.10.2
+        tor-A     swp50 3.3.10.1
+
+    5: Provides the a new network IP per server enlace
+    e.g:
+        server-A0 eth1  2.2.10.1
+        tor-A     swp1  0
+        tor-A     swp50 0
+        tor-B     swp49 0
+        tor-B     swp1  0
+        server-B0 eth1  2.2.20.1
+
+    When the option --spine is set, the ip command will produce a different set of addresses, as follows
+
+    1: Provides no IP
+    e.g:
+        spine      swp1  0
+        spine      swp2  0
+        tor-LA     swp50 0
+        tor-LA     swp1  0
+        tor-RA     swp50 0
+        tor-RA     swp1  0
+        server-LA0 eth1  0
+        server-RA0 eth1  0
+
+    2: Provides the same IP network for each half of the spine topology
+    e.g:
+        server-LA0 eth1  1.1.10.2
+        tor-LA     swp1  0
+        tor-LA     swp50 0
+        server-LB0 eth1  1.1.10.4
+        tor-LB     swp50 0
+        tor-LB     swp1  0
+        spine      swp1  1.1.10.1
+        spine      swp2  1.1.10.3
+        spine      swp3  1.1.10.5
+        spine      swp4  1.1.10.7
+        tor-RB     swp50 0
+        tor-RB     swp1  0
+        server-RB0 eth1  1.1.10.8
+        tor-RA     swp50 0
+        tor-RA     swp1  0
+        server-RA0 eth1  1.1.10.6
+
+    3: Provides the same IP network for every port
+    e.g:
+        server-LA0 eth1  1.1.10.4
+        tor-LA     swp1  1.1.10.3
+        tor-LA     swp50 1.1.10.2
+        server-LB0 eth1  1.1.10.8
+        tor-LB     swp1  1.1.10.7
+        tor-LB     swp50 1.1.10.6
+        spine      swp1  1.1.10.1
+        spine      swp2  1.1.10.5
+        spine      swp3  1.1.10.9
+        spine      swp4  1.1.10.13
+        tor-RB     swp50 1.1.10.14
+        tor-RB     swp1  1.1.10.15
+        server-RB0 eth1  1.1.10.16
+        tor-RA     swp50 1.1.10.10
+        tor-RA     swp1  1.1.10.11
+        server-RA0 eth1  1.1.10.12
+
+    4: Provides the a new IP network for each logical enlace
+    e.g:
+        server-LA0 eth1  2.2.10.3
+        tor-LA     swp1  2.2.10.2
+        server-LB0 eth1  2.2.20.3
+        tor-LB     swp1  2.2.20.2
+        tor-LA     swp50 3.3.50.1
+        spine      swp1  3.3.50.2
+        tor-LB     swp50 3.3.60.1
+        spine      swp2  3.3.60.2
+        spine      swp3  3.3.70.2
+        tor-RA     swp50 3.3.70.1
+        spine      swp4  3.3.80.2
+        tor-RB     swp50 3.3.80.1
+        tor-RB     swp1  2.2.40.2
+        server-RB0 eth1  2.2.40.3
+        tor-RA     swp1  2.2.30.2
+        server-RA0 eth1  2.2.30.3
+
+    5: Provides the a new IP network for servers and spine ports
+    e.g:
+        server-LA0 eth1  2.2.10.3
+        server-LB0 eth1  2.2.20.3
+        tor-LA     swp1  0
+        tor-LB     swp1  0
+        tor-LA     swp50 0
+        tor-LB     swp50 0
+        spine      swp1  3.3.50.2
+        spine      swp2  3.3.60.2
+        spine      swp3  3.3.70.2
+        spine      swp4  3.3.80.2
+        tor-RB     swp50 0
+        tor-RA     swp50 0
+        tor-RB     swp1  0
+        tor-RA     swp1  0
+        server-RB0 eth1  2.2.40.3
+        server-RA0 eth1  2.2.30.3
+
+    6: Provides the same IP network for each half of the topology, but only for servers and spine
+    e.g:
+        server-LA0 eth1  1.1.10.2
+        server-LB0 eth1  1.1.10.4
+        tor-LA     swp1  0
+        tor-LA     swp50 0
+        tor-LB     swp1  0
+        tor-LB     swp50 0
+        spine      swp1  1.1.10.1
+        spine      swp2  1.1.10.3
+        spine      swp3  1.1.20.1
+        spine      swp4  1.1.20.3
+        tor-RB     swp50 0
+        tor-RA     swp50 0
+        tor-RB     swp1  0
+        tor-RA     swp1  0
+        server-RB0 eth1  1.1.20.4
+        server-RA0 eth1  1.1.20.2

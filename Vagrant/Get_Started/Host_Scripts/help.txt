@@ -44,9 +44,24 @@ a topology for datacenters.
   ./User_Script/instructions.sh
 
 --brige
+  This option will run an array of bash commands in order to set a bridge between each server machine
+  This way, the tor machine will run as it is a switch hardware, redirecting packets around its ports
+  When this option is set, the --ip option will run in its normal mode
 
 --vlan
+  This option runs an array of bash commands in order to set swp50/swp49 as a vlan port, after that
+  it will bridge half of the server connected to the tor to each vlan port, in order to logically divide topology
+  This way, the tor machine will run as it is a switch hardware, redirecting packets around its ports
+  When this option is set, the --ip option will run in its normal mode
 
 --spine
+  This option will adds third layer of machines, creating one new vm, called spine, that connects to every single
+  tor via its swp ports. This new machine will run as it is a router, and should be configured in order to divide
+  each half of its swp as a different network.
+  When running this command, each tor and server created using the option -t -s will be duplicated (one for each half)
+  The tor machines will run as switchs, and each vm will contain the prefix L/R in order to identify its half
+  When this option is set, the --ip option will not run in its normal mode
 
 --ip
+  This option provides an array of ips to each machine, these might vary according to the argument given as input and
+  its type of operation. For more options type --help ip

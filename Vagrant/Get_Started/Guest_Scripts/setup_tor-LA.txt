@@ -1,2 +1,0 @@
-tor-LA swp50 0
-tor-LA swp1 0

@@ -11,10 +11,12 @@ NC='\033[0m' # No Color
 server="";tor="";memory="";os="";version="";destroy="";commandList="";standart="";ip="";op=0;
 
 ####HELP TEXT
-if [[ $1 == --help ]]; then
-  echo -e "-s server -- number of servers\n-t tor -- number of tors\n-m memory -- memory alocation\n-o os -- operation system\n-v version -- os version"
-  echo -e "-d destroy -- destroys topology after iteration\n-sw switch -- does not provide ip to swp\n-c commands -- uses a bash file to provide a list of commands"
-  echo "-st standart -- uses a txt file to have standart inputs"
+if [[ $1 == --help ]] || [[ $1 == -help ]] || [[ $1 == "help" ]]; then
+  if [[ $2 == ip ]]; then
+    cat ./Host_Scripts/help_ip.txt
+    exit
+  fi
+  cat ./Host_Scripts/help.txt
   exit
 fi
 
