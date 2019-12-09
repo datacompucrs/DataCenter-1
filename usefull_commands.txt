@@ -1,4 +1,9 @@
-Linha=`cat Vagrantfile | grep -on "config.vm.define" | head -1 | cut -f1 -d ':'`
+###################################################
+###################################################
+###################################################
+LINUX STUFF
+
+
 Linha=$((Linha-2))
 myText="config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false, nfs_version: 4"
 sed "$Linha i $myText" Vagrantfile > Vagrantfile1
@@ -10,7 +15,10 @@ IP GAPHL16: 10.32.163.45
 ssh -X datacom@<IP> ou ssh -X datacom@<ID_DA_MAQUINA>
 Utilizar interface da outra maquina: nautilus &
 
-VLAN
+###################################################
+###################################################
+###################################################
+VLAN STUFF
 
 instalar o pacote VLAN
 sudo apt-get install vlan
@@ -37,3 +45,26 @@ ip link set dev eth1 master br0
 ip link set dev eth0 nomaster
 
 ip link del br0
+
+
+
+###################################################
+###################################################
+###################################################
+VXLAN STUFF
+
+
+sudo ip link add vxlan10 type vxlan id 10 group 239.1.1.1 dstport 0 dev swp50
+sudo brctl addbr brvxlan10
+sudo brctl addif brvxlan10 vxlan10
+sudo ifconfig brvxlan10 0 up
+sudo ifconfig vxlan10 0 up
+
+sudo ip link add vxlan20 type vxlan id 20 group 239.1.1.1 dstport 0 dev swp50
+sudo brctl addbr brvxlan20
+sudo brctl addif brvxlan20 vxlan20
+sudo ifconfig brvxlan20 0 up
+sudo ifconfig vxlan20 0 up
+
+sudo brctl addif brvxlan10 swp1
+sudo brctl addif brvxlan20 swp2
