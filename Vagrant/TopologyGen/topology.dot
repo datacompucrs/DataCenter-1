@@ -1,0 +1,17 @@
+graph vx {
+"oob.1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"router.1.1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"server.1.1.1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"oob.2" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"router.2.1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"server.2.1.1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+"oob.1":"eth1" -- "router.1.1":"eth50"
+"router.1.1":"eth1" -- "server.1.1.1":"eth50"
+
+"oob.2":"eth1" -- "router.2.1":"eth50"
+"router.2.1":"eth1" -- "server.2.1.1":"eth50"
+
+
+"oob.1":"eth50" -- "oob.2":"eth49"
+
+}

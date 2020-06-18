@@ -1,0 +1,18 @@
+!
+! Zebra configuration saved from vty
+!   2020/06/18 04:51:52
+!
+hostname bgpd
+password zebra
+log stdout
+!
+router bgp 7675
+ bgp router-id 10.255.1.95
+
+!
+ address-family ipv6
+ exit-address-family
+ exit
+!
+line vty
+!

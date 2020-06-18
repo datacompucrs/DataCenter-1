@@ -1,0 +1,13 @@
+!
+! Zebra configuration saved from vty
+!   2020/06/18 04:34:51
+!
+hostname Router
+password zebra
+enable password zebra
+
+ip forwarding
+!
+!
+line vty
+!
