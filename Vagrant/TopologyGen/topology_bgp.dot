@@ -1,0 +1,24 @@
+graph vx {
+"r1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+ 
+"s1" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+
+
+"r2" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+
+"s2" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+
+"r3" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ]  
+
+"s3" [function="leaf" vagrant="eth1" os="hashicorp/bionic64" version="1.0.282" memory="500" config="./helper_scripts/config_production_switch.sh" ] 
+
+
+"r1":"eth1" -- "s1":"eth1"
+"r2":"eth1" -- "s2":"eth1"
+"r3":"eth1" -- "s3":"eth1"
+
+"r1":"eth50" -- "r2":"eth50"
+"r1":"eth49" -- "r3":"eth50"
+"r2":"eth49" -- "r3":"eth49"
+
+}
